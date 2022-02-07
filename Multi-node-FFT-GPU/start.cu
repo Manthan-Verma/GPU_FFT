@@ -1,7 +1,7 @@
 /* This is a code that compute FFT on multi-nodes on GPUs*/
 
 /*
-Copyright (c) 2022, Manthan-Verma
+Copyright (c) 2022, Mahendra Verma, Manthan verma, Soumyadeep Chatterjee
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,13 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/*
+    \brief ---> Code to compute FFT on multi-node on GPUs Scaling upto 512 GPUs for grid size upto 4096^3
+    \author ---> Manthan verma, Soumyadeep Chatterjee, Gaurav Garg, Bharatkumar Sharma, Nishant Arya, Shashi Kumar, Mahendra K.Verma
+    \dated --> Feb 2022
+    \copyright New BSD License
 */
 
 #include "header.cuh"
