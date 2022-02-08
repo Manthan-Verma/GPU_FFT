@@ -17,36 +17,37 @@ Name_of_code requires several libraries (listed later in this section) for compi
       
 ## Required Libraries
 
-The following libraries are required for installing and running fastSF:
+The following libraries are required for installing and running Name_of_code:
 
-    Blitz++ (Version 1.0.2)- All array manipulations are performed using the Blitz++ library. Download Blitz++ from here. After downloading, change to the blitz-master directory and enter the following commands
+Cuda Library is used for development of our code. This library can be installed from :
+       https://developer.nvidia.com/cuda-downloads
+       Then choose the system type and download the distribution.
 
-    CC=gcc CXX=g++ ./configure --prefix=$HOME/local
+After extracting install the software and go with the instructions. Put the path of installationn where you want to install.
 
-    make install
+An MPI (Message Passing Interface) Library - Name_of_code uses MPI for parallelism. The software was tested using OPEN-MPI(Version 4.1.1), however, any standard MPI implementation should not be sufficient because for our program to give best scaling and timming we need MPI to be CUDA Aware. Here, we will provide instructions for installing OPEN-MPI. Download OPEN-MPI from:
+    https://www.open-mpi.org/
+    
+After extraction, change to openmpi-4.1.1 folder and enter the following:
 
-    YAML-cpp(Version 0.3.0) - The input parameters are stored in the para.yaml file which needs the YAML-cpp library to parse. Download YAML-cpp from here. Extract the zip/tar file and change the yaml-cpp-release-0.3.0 directory. Important: Please ensure that CMake is installed in your system. Enter the following commands:
+    CC=gcc CXX=g++ ./configure --prefix=$HOME/local --with-cuda=$(Path to cuda installation)
 
-    CC=gcc CXX=g++ cmake -DCMAKE_INSTALL_PREFIX=$HOME/local
+    make all install
+    
+## Compilation instructions
 
-    make install
+To compile run the following command:
+       nvcc start.cu data_init.cu gpu_data.cu bench.cu cufft_calls.cu -I (path to include dirctory of MPI) -L (path to library dirctory of MPI) -lmpi -lcufft -o run -std=c++17
+       
+       After this a object file named run will be created in the same folder 
+## Detailed Instructions for running and Benchmarking the Program
 
-    An MPI (Message Passing Interface) Library - fastSF uses MPI for parallelism. The software was tested using MPICH(Version 3.3.2), however, any standard MPI-1 implementation should be sufficient. Here, we will provide instructions for installing MPICH. Download MPICH from here. After extraction, change to mpich-3.3.2 folder and enter the following:
-
-    CC=gcc CXX=g++ ./configure --prefix=$HOME/local
-
-    make install
-
-    HDF5(Version 1.8.20) - The output files are written in HDF5 format. Download HDF5 from here. After extracting the tar file, change to hdf5-1.8.20 and enter the following:
-
-    CC=mpicc CXX=mpicxx ./configure --prefix=$HOME/local --enable-parallel --without-zlib
-
-    make install
-
-    H5SI(Version 1.1.1) - This library is used for simplifying the input-output operations of HDF5. Download H5SI from here. After downloading the zip file, extract it and change to h5si-master/trunk. Important: Please ensure that CMake is installed in your system. Enter the following:
-
-    CXX=mpicxx cmake . -DCMAKE_INSTALL_PREFIX=$HOME/local
-
-    make
-
-    make install
+       Our Code runs FFT on GPUs. We used the slab-decomposition in our code because of the lack of less no of GPUs. We used MPI_Isend, MPI_Irecv, CudaMemcpy for communication and 2 our own transpose kernels with high throughput.
+       It calculates 3D FFT R2C on multi-node, multi-GPU using cuFFT in Backend.
+       
+       To run/ Benchmar the code :
+              mpiexec -np <no_of_processes/no_of_GPUs to run on> --host hostname:<no_of_GPU_on_this_host>,hostname2<no_of_GPU_on_this_host> run <x axis grid size> <y axis grid size> <z axis grid size> <no_of_iterations> <precision>
+              
+              example:
+              mpiexec -np 4 --host h1:2,h2:2 run 512 512 512 100 double                      ---> for double preciosn  and grid size ( 512,512,512), for 100 iterations 
+                                                                                                  for ingle precision put single in place of double.(Put iterations as 0 for single run)
