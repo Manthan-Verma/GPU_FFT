@@ -30,7 +30,7 @@ An MPI (Message Passing Interface) Library - Name_of_code uses MPI for paralleli
     
 After extraction, change to openmpi-4.1.1 folder and enter the following:
 
-    CC=gcc CXX=g++ ./configure --prefix=$HOME/local --with-cuda=$(Path to cuda installation)
+    ./configure --prefix=$HOME/local --with-cuda=$(Path to cuda installation) --enable-mpi-cxx
 
     make all install
     
@@ -50,4 +50,4 @@ To compile run the following command:
               
               example:
               mpiexec -np 4 --host h1:2,h2:2 run 512 512 512 100 double                      ---> for double preciosn  and grid size ( 512,512,512), for 100 iterations 
-                                                                                                  for ingle precision put single in place of double.(Put iterations as 0 for single run)
+                                                                                                  for ingle precision put single in place of double.(Put iterations as 1 for single run)
