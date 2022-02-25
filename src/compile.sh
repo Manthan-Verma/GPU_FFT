@@ -35,3 +35,7 @@
 
 
 nvcc start.cu data_init.cu gpu_data.cu bench.cu cufft_calls.cu -I /usr/include/ -L /usr/lib64/ -lmpi -lcufft -o run -std=c++17
+
+# TO run
+
+mpiexec -np <no of process> -host <hostnames> nic_bindings.sh ./run <Nx> <Ny> <Nz> <no of iterations> <single or double>
