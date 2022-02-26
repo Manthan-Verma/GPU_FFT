@@ -49,7 +49,9 @@ To compile run the following command:
               mpiexec -np <no_of_processes/no_of_GPUs to run on> --host hostname:<no_of_GPU_on_this_host>,hostname2<no_of_GPU_on_this_host> nic_bindings.sh run <x axis grid size> <y axis grid size> <z axis grid size> <no_of_iterations> <precision>
               
               example:
-              mpiexec -np 4 --host h1:2,h2:2 nic_bindings run 512 512 512 100 double                      ---> for double preciosn  and grid size ( 512,512,512), for 100 iterations 
-                                                                                                  for ingle precision put single in place of double.(Put iterations as 1 for single run)
+              mpiexec -np 4 --host h1:2,h2:2 nic_bindings.sh run 512 512 512 100 double                      ---> for double preciosn  and grid size ( 512,512,512), for 100 iterations 
+                                                                                                  for single precision put single in place of double.(Put iterations as 1 for single run)
        
-## Here set the nic bindings file according to the linking architecture of your device. 
+## Also note that to run this files pls make changes in nic_bindings.sh acc your network topology and please make nic_bindings.sh, run file as executable using chmod or any other command 
+
+## To benchmark this code please comment the if comdition inside the function becnhmarking_loop( i.e from line no 134 to 140 in file bench.cu)
