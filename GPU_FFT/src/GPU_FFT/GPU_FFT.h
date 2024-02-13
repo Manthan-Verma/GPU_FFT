@@ -37,6 +37,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#if defined(_MSC_VER)
+#define inline_qualifier __inline
+#define _USE_MATH_DEFINES
+#include <direct.h>
+#else
+#define inline_qualifier inline
+#endif
+
+
 #ifndef GPU_FFT_H_
 #define GPU_FFT_H_
 
@@ -78,7 +87,7 @@ class GPU_FFT
     int comm_no{0};
 
     // CUFFT DATA POINTS
-    cufftHandle planR2C,
+    fftHandle planR2C,
         planC2R, planC2C;
     size_t *worksize;
     int n_r2c[2], *inembed_r2c{nullptr}, *onembed_r2c{nullptr}, istride_r2c{1}, ostride_r2c{1};
@@ -95,9 +104,9 @@ class GPU_FFT
     dim3 block_fourier_space;
 
     // CUFFT TYPES
-    cufftType_t cufft_type_r2c{CUFFT_R2C};
-    cufftType_t cufft_type_c2r{CUFFT_C2R};
-    cufftType_t cufft_type_c2c{CUFFT_C2C};
+    ffttype_t type_r2c{FFT_R2C};
+    ffttype_t type_c2r{FFT_C2R};
+    ffttype_t type_c2c{FFT_C2C};
 
 public:
     GPU_FFT(int64 Nx_in, int64 Ny_in, int64 Nz_in, int procs, int rank, MPI_Comm &MPI_COMMUNICATOR_INPUT); // Constructor

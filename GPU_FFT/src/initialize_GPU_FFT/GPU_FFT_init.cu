@@ -48,7 +48,7 @@ GPU_FFT<T1, T2>::GPU_FFT(int64 Nx_in, int64 Ny_in, int64 Nz_in, int procs, int r
     Nz = Nz_in;
 
     // Initalizing the buffer data pointer
-    cudaMalloc(&buffer, sizeof(T2) * Nx * (Ny / procs) * (Nz / 2 + 1));
+    buffer = Memory_allocation_gpu(buffer, Nx * (Ny / procs) * (Nz / 2 + 1));
 
     // Setting the grid and blocks for FFT kernels
     grid_fourier_space = {((Nx * (Ny / procs) * (Nz / 2 + 1)) / 256) + 1, 1, 1};
@@ -81,24 +81,24 @@ void GPU_FFT<T1, T2>::INIT_GPU_FFT()
     if (std::is_same<T1, T1_d>::value)
     {
         // CUFFT TYPES
-        cufft_type_r2c = CUFFT_D2Z;
-        cufft_type_c2r = CUFFT_Z2D;
-        cufft_type_c2c = CUFFT_Z2Z;
+        type_r2c = FFT_D2Z;
+        type_c2r = FFT_Z2D;
+        type_c2c = FFT_Z2Z;
     }
 
     // Plans intiialization
-    cufftCreate(&planR2C);
-    cufftCreate(&planC2R);
-    cufftCreate(&planC2C);
-    cufftMakePlanMany(planC2C, rank_c2c, n_c2c, inembed_c2c, istride_c2c, idist_c2c, onembed_c2c, ostride_c2c, odist_c2c, cufft_type_c2c, BATCH_C2C, worksize);
-    cufftMakePlanMany(planR2C, rank_r2c, n_r2c, inembed_r2c, istride_r2c, idist_r2c, onembed_r2c, ostride_r2c, odist_r2c, cufft_type_r2c, BATCH_r2c, worksize);
-    cufftMakePlanMany(planC2R, rank_r2c, n_r2c, inembed_r2c, istride_r2c, idist_r2c, onembed_r2c, ostride_r2c, odist_r2c, cufft_type_c2r, BATCH_r2c, worksize);
+    fftCreate(&planR2C);
+    fftCreate(&planC2R);
+    fftCreate(&planC2C);
+    fftMakePlanMany(planC2C, rank_c2c, n_c2c, inembed_c2c, istride_c2c, idist_c2c, onembed_c2c, ostride_c2c, odist_c2c, type_c2c, BATCH_C2C, worksize);
+    fftMakePlanMany(planR2C, rank_r2c, n_r2c, inembed_r2c, istride_r2c, idist_r2c, onembed_r2c, ostride_r2c, odist_r2c, type_r2c, BATCH_r2c, worksize);
+    fftMakePlanMany(planC2R, rank_r2c, n_r2c, inembed_r2c, istride_r2c, idist_r2c, onembed_r2c, ostride_r2c, odist_r2c, type_c2r, BATCH_r2c, worksize);
 }
 
 template <typename T1, typename T2>
 GPU_FFT<T1, T2>::~GPU_FFT()
 {
-    cudaFree(buffer);
+    // cudaFree(buffer);
 }
 
 // ########### Explicit instantiation of class templates ##################

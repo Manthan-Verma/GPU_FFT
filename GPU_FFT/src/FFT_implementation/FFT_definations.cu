@@ -39,39 +39,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Explicit initialization of CUFFT R2C
 template <>
-void cufft_call_r2c<T1_f, T2_f>(cufftHandle &plan, T1_f *input_data, T2_f *output_data)
+void cufft_call_r2c<T1_f, T2_f>(fftHandle &plan, T1_f *input_data, T2_f *output_data)
 {
-    cufftExecR2C(plan, input_data, output_data);
+    fftExecR2C(plan, input_data, output_data);
 }
 
 template <>
-void cufft_call_r2c<T1_d, T2_d>(cufftHandle &plan, T1_d *input_data, T2_d *output_data)
+void cufft_call_r2c<T1_d, T2_d>(fftHandle &plan, T1_d *input_data, T2_d *output_data)
 {
-    cufftExecD2Z(plan, input_data, output_data);
+    fftExecD2Z(plan, input_data, output_data);
 }
 
 // Explicit initialization of CUFFT C2C
 template <>
-void cufft_call_c2c<T2_f>(cufftHandle &plan, T2_f *input_data, T2_f *output_data, int direction)
+void cufft_call_c2c<T2_f>(fftHandle &plan, T2_f *input_data, T2_f *output_data, int direction)
 {
-    cufftExecC2C(plan, input_data, output_data, direction);
+    fftExecC2C(plan, input_data, output_data, direction);
 }
 
 template <>
-void cufft_call_c2c<T2_d>(cufftHandle &plan, T2_d *input_data, T2_d *output_data, int direction)
+void cufft_call_c2c<T2_d>(fftHandle &plan, T2_d *input_data, T2_d *output_data, int direction)
 {
-    cufftExecZ2Z(plan, input_data, output_data, direction);
+    fftExecZ2Z(plan, input_data, output_data, direction);
 }
 
 // Explicit initialization of CUFFT C2R
 template <>
-void cufft_call_c2r<T1_f, T2_f>(cufftHandle &plan, T2_f *input_data, T1_f *output_data)
+void cufft_call_c2r<T1_f, T2_f>(fftHandle &plan, T2_f *input_data, T1_f *output_data)
 {
-    cufftExecC2R(plan, input_data, output_data);
+    fftExecC2R(plan, input_data, output_data);
 }
 
 template <>
-void cufft_call_c2r<T1_d, T2_d>(cufftHandle &plan, T2_d *input_data, T1_d *output_data)
+void cufft_call_c2r<T1_d, T2_d>(fftHandle &plan, T2_d *input_data, T1_d *output_data)
 {
-    cufftExecZ2D(plan, input_data, output_data);
+    fftExecZ2D(plan, input_data, output_data);
 }

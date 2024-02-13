@@ -1,40 +1,54 @@
-NVCC_FLAGS= --device-c -w -Xcompiler -fPIC
+COMPILER ?= HIP
+
 Oflag= -O3
 
-INSTALL_DIR ?= /home/manthan/
+INSTALL_DIR ?= /mnt/Disk_6TB/Manthan/Trash/GPU_FFT
 
-CUDA_HOME?=/usr/local/
-CUDA_INC=$(CUDA_HOME)/include/
-CUDA_LIB=$(CUDA_HOME)/lib64/
-NVCC= $(CUDA_HOME)/bin/nvcc -std=c++14
+CC_HOME?=/usr/local/cuda-12.2
+CC_INC=$(CC_HOME)/include/
 
-MPI_HOME ?= /home/manthan
-MPI_INC_FLAG= $(MPI_HOME)/include/
-MPI_LIB_FLAG= $(MPI_HOME)/lib/
+MPI_HOME ?= /scratch/Manthan_phy/hpc_sdk/Linux_x86_64/23.9/comm_libs/mpi
+MPI_INC= $(MPI_HOME)/include/
+MPI_LIB= $(MPI_HOME)/lib/
 
-CUFFT_link= -lcufft
 MPI_link= -lmpi
 
+ifeq ($(COMPILER),HIP)
+CC_LIB=$(CC_HOME)/lib/
+CC= $(CC_HOME)/bin/hipcc -std=c++14
+NVCC_FLAGS= -w -Xhip -fPIC -Xhip -O3
+CUFFT_link= -lhipfft
+INCLUDE_ALL= -I $(CC_INC) -I $(MPI_INC)
+LIB_ALL= -L $(CC_LIB) -L $(MPI_LIB)
+
+else ifeq ($(COMPILER),NVCC)
+CC_LIB=$(CC_HOME)/lib64/
+CC= $(CC_HOME)/bin/nvcc -std=c++14
+NVCC_FLAGS= -w -Xcompiler -fPIC -Xcompiler -O3
+CUFFT_link= -lcufft
+INCLUDE_ALL= -I $(CC_INC),$(MPI_INC)
+LIB_ALL= -L $(CC_LIB),$(MPI_LIB)
+endif
+
 Link_all= $(CUFFT_link) $(MPI_link)
-INCLUDE_ALL= -I $(CUDA_INC),$(MPI_INC_FLAG)
-LIB_ALL= -L $(CUDA_LIB),$(MPI_LIB_FLAG)
+
 
 start: FFT_implementation.o init_fft.o transpose.o
-	$(NVCC)  FFT_R2C.o FFT_C2R.o FFT_def.o comm_setup.o init_fft_data.o transpose_ker.o $(INCLUDE_ALL) $(LIB_ALL) -o\
-	 libGPU_FFT.so -Xcompiler -Wall -Xcompiler -O3 -Xcompiler -fPIC -shared -lc $(Link_all)
+	$(CC)  FFT_R2C.o FFT_C2R.o FFT_def.o comm_setup.o init_fft_data.o transpose_ker.o $(INCLUDE_ALL) $(LIB_ALL) -o\
+	 libGPU_FFT.so $(NVCC_FLAGS) -shared -lc $(Link_all)
 
 FFT_implementation.o: src/FFT_implementation/FFT_C2R.cu src/FFT_implementation/FFT_R2C.cu \
 						src/FFT_implementation/FFT_definations.cu
-	$(NVCC) src/FFT_implementation/FFT_R2C.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c  -o FFT_R2C.o
-	$(NVCC) src/FFT_implementation/FFT_C2R.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c  -o FFT_C2R.o
-	$(NVCC) src/FFT_implementation/FFT_definations.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c  -o FFT_def.o
+	$(CC) src/FFT_implementation/FFT_R2C.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c  -o FFT_R2C.o
+	$(CC) src/FFT_implementation/FFT_C2R.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c  -o FFT_C2R.o
+	$(CC) src/FFT_implementation/FFT_definations.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c  -o FFT_def.o
 
 init_fft.o: src/initialize_GPU_FFT/communications_setup.cu src/initialize_GPU_FFT/GPU_FFT_init.cu
-	$(NVCC) src/initialize_GPU_FFT/communications_setup.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o comm_setup.o
-	$(NVCC) src/initialize_GPU_FFT/GPU_FFT_init.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o init_fft_data.o
+	$(CC) src/initialize_GPU_FFT/communications_setup.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o comm_setup.o
+	$(CC) src/initialize_GPU_FFT/GPU_FFT_init.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o init_fft_data.o
 
 transpose.o: src/matrix_transpose/transpose.cu
-	$(NVCC) src/matrix_transpose/transpose.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) $(Oflag) -c -o transpose_ker.o
+	$(CC) src/matrix_transpose/transpose.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) $(Oflag) -c -o transpose_ker.o
 
 install:
 	mkdir -p $(INSTALL_DIR)/include

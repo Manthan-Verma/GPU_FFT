@@ -35,18 +35,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     \copyright New BSD License
 */
 
-
 #include "../GPU_FFT/GPU_FFT.h"
 
 template <typename T1, typename T2>
 void GPU_FFT<T1, T2>::GPU_FFT_C2R(T2 *input_data)
 {
     // Inverse 1D
-    cufft_call_c2c(planC2C, input_data, buffer, CUFFT_INVERSE);
+    cufft_call_c2c(planC2C, input_data, buffer, FFT_INVERSE);
 
     // Transpose within chunk, save in slab_outp_data_tr to save space
     chunk_transpose_inverse<<<grid_fourier_space, block_fourier_space>>>(buffer, input_data, Nx, Ny, Nz, procs);
-    cudaDeviceSynchronize();
+    Device_synchronize();
 
     // Communications
     comm_no = 0;
@@ -59,11 +58,12 @@ void GPU_FFT<T1, T2>::GPU_FFT_C2R(T2 *input_data)
             comm_no++;
         }
     }
-    cudaMemcpy((buffer + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (input_data + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), sizeof(T2) * (Nx / procs) * (Ny / procs) * (Nz / 2 + 1), cudaMemcpyDeviceToDevice);
+    Memory_copy_gpu_to_gpu((input_data + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (buffer + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (Nx / procs) * (Ny / procs) * (Nz / 2 + 1));
     MPI_Waitall(2 * (procs - 1), requests, MPI_STATUS_IGNORE);
 
     // Transpose
-    transpose_slab<<<grid_fourier_space, block_fourier_space>>>(buffer,input_data, (Nx / procs), Ny, Nz);
+    transpose_slab<<<grid_fourier_space, block_fourier_space>>>(buffer, input_data, (Nx / procs), Ny, Nz);
+    Device_synchronize();
 
     cufft_call_c2r(planC2R, input_data, (T1 *)input_data);
 }

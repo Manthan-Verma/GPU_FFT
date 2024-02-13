@@ -18,16 +18,17 @@ We focus on communication and computations times, which are denoted by Tcomp and
 
 
 ## INSTALLING GPU_FFT
-
+This FFT works for BOPTH AMD and NVIDIA GPUs. This FFT uses HIP for AMD GPUs.
 Installation is very simple. Follow the following steps :
 
 1. Clone this GIT-REPO and go to GPU_FFT folder
-2. Make sure you have " CUDA-AWARE MPI and CUDA " are installed in your system.
+2. Make sure you have " CUDA-AWARE or ROCM-AWARE MPI and CUDA or ROCM/HIP " are installed in your system.
 3. Now do \
-`make CUDA_HOME=<ENTER_CUDA_HOME_DIRECTORY> MPI_HOME=<CUDA_AWARE_MPI_HOME_DIRECTORY>`
-4. Now , do \
-`make INSTALL_DIR=<INSTALLATION_PATH> install`
-5. GPU_FFT will be install in the specified folder path.
+`make CC_HOME=<> MPI_HOME=<>`
+4. Here in `CC_HOME` give the path od CUDA HOME directory or ROCM HOME directory. While, in `MPI_HOME` put the home of CUDA-AWARE or ROCM-AWARE MPI Directory.
+5. Now , do \
+`make INSTALL_DIR=<INSTALLATION_DIRECTORY> install`
+6. GPU_FFT will be install in the specified folder path.
 
 ## USING GPU_FFT
 First, make sure the Include and library directories of installed library is in path.
@@ -51,12 +52,14 @@ Now you can use the FFT using ,
 In the end destroy the FFT using `FFT->~GPU_FFT()`.
 
 ## Testing GPU_FFT Installation
-A Basic installation script is provided in GPU_FFT_TEST_SCRIPT folder. Do a make in TEST_SCRIPT folder by setting the relative parameters in make file. and then do `make test_fft Nx=128 Ny=128 Ny=128`
+A Basic installation script is provided in GPU_FFT_TEST_SCRIPT folder. Do a `make CC_HOME=<> MPI_HOME=<> GPU_FFT_HOME=<>` in TEST_SCRIPT folder by setting the relative parameters in make file. and then do `make CC_HOME=<> MPI_HOME=<> GPU_FFT_HOME=<> test_fft Nx=128 Ny=128 Ny=128`
 
 Here we have used a real function :: $f (x, y, z) = 8 sin(x) sin(2y) sin(3z) + 8 sin(4x) sin(5y) sin(6z)$, \
 output will be :
 
 ![output](image.png)
+
+You can set Nx, Ny, Nz according to your requirment
 
 ## Comparing this FFT with FFTK(CPU BASED FFT DEVELOPED IN OUR LAB)
 Time of multicore FFT of $1536^3$ grid with 196608 cores of Cray XC40 is comparable to that of GPU-FFT of $2048^3$ grid with 128 GPUs.

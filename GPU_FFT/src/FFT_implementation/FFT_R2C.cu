@@ -45,7 +45,7 @@ void GPU_FFT<T1, T2>::GPU_FFT_R2C(T1 *input_data)
 
     // Transpose slab wise
     transpose_slab<<<grid_fourier_space, block_fourier_space>>>(((T2 *)input_data), buffer, Ny, (Nx / procs), Nz);
-    cudaDeviceSynchronize();
+    Device_synchronize();
 
     // Communication
     comm_no = 0;
@@ -58,14 +58,14 @@ void GPU_FFT<T1, T2>::GPU_FFT_R2C(T1 *input_data)
             comm_no++;
         }
     }
-    cudaMemcpy((((T2 *)input_data) + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (buffer + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), sizeof(T2) * (Nx / procs) * (Ny / procs) * (Nz / 2 + 1), cudaMemcpyDeviceToDevice);
+    Memory_copy_gpu_to_gpu((buffer + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (((T2 *)input_data) + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (Nx / procs) * (Ny / procs) * (Nz / 2 + 1));
     MPI_Waitall(2 * (procs - 1), requests, MPI_STATUS_IGNORE);
 
     // Transpose within chunk, save in slab_outp_data_tr to save space
     chunk_transpose<<<grid_fourier_space, block_fourier_space>>>(((T2 *)input_data), buffer, Nx, Ny, Nz, procs);
 
     // 1D FFT along X
-    cufft_call_c2c(planC2C, buffer, ((T2 *)input_data), CUFFT_FORWARD);
+    cufft_call_c2c(planC2C, buffer, ((T2 *)input_data), FFT_FORWARD);
 }
 
 // ########### Explicit instantiation of class templates ##################

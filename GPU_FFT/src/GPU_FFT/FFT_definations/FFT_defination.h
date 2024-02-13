@@ -46,12 +46,12 @@ using int64 = long long int;
 
 // CUFFT Specialization of functions
 template <typename T1, typename T2>
-void cufft_call_r2c(cufftHandle &plan, T1 *input_data, T2 *output_data);
+void cufft_call_r2c(fftHandle &plan, T1 *input_data, T2 *output_data);
 
 template <typename T2>
-void cufft_call_c2c(cufftHandle &plan, T2 *input_data, T2 *output_data, int direction);
+void cufft_call_c2c(fftHandle &plan, T2 *input_data, T2 *output_data, int direction);
 
 template <typename T1, typename T2>
-void cufft_call_c2r(cufftHandle &plan, T2 *input_data, T1 *output_data);
+void cufft_call_c2r(fftHandle &plan, T2 *input_data, T1 *output_data);
 
 #endif

@@ -36,6 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #pragma once
+#if defined(_MSC_VER)
+#define inline_qualifier __inline
+#define _USE_MATH_DEFINES
+#include <direct.h>
+#else
+#define inline_qualifier inline
+#endif
+
 
 #ifndef TRANSITIONS_H_
 #define TRANSITIONS_H_
@@ -51,7 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __HIPCC__
 #include <hipfft.h>
 #include <hip/hip_runtime.h>
-#include <hiprand_kernel.h>
     // ########### Type Definations ###########
     typedef hipfftReal T1_f;
     typedef hipfftComplex T2_f;
@@ -68,13 +75,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     static const auto FFT_D2Z = HIPFFT_D2Z;
     static const auto FFT_C2R = HIPFFT_C2R;
     static const auto FFT_Z2D = HIPFFT_Z2D;
+    static const auto FFT_C2C = HIPFFT_C2C;
+    static const auto FFT_Z2Z = HIPFFT_Z2Z;
+    static const auto memcpy_device_to_device = hipMemcpyDeviceToDevice;
+    static const auto memcpy_host_to_device = hipMemcpyHostToDevice;
+    static const auto memcpy_device_to_host = hipMemcpyDeviceToHost;
+
     const auto fftCreate = hipfftCreate;
     const auto fftMakePlanMany = hipfftMakePlanMany;
     const auto fftExecC2R = hipfftExecC2R;
     const auto fftExecR2C = hipfftExecR2C;
     const auto fftExecZ2D = hipfftExecZ2D;
     const auto fftExecD2Z = hipfftExecD2Z;
+    const auto fftExecC2C = hipfftExecC2C;
+    const auto fftExecZ2Z = hipfftExecZ2Z;
     const auto fftSetStream = hipfftSetStream;
+    const auto FFT_FORWARD = HIPFFT_FORWARD;
+    const auto FFT_INVERSE = HIPFFT_BACKWARD;
+    
 #endif
 
 #ifdef __CUDACC__
@@ -83,7 +101,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include <cuda_profiler_api.h>
-#include <curand_kernel.h>
 
     // ########### Type Definations ###########
     typedef cufftReal T1_f;
@@ -96,18 +113,103 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     // FFTs
     typedef cufftType_t ffttype_t;
-    typedef cufftHandle *fftHandle;
+    typedef cufftHandle fftHandle;
     static const auto FFT_R2C = CUFFT_R2C;
     static const auto FFT_D2Z = CUFFT_D2Z;
     static const auto FFT_C2R = CUFFT_C2R;
     static const auto FFT_Z2D = CUFFT_Z2D;
+    static const auto FFT_C2C = CUFFT_C2C;
+    static const auto FFT_Z2Z = CUFFT_Z2Z;
+    static const auto memcpy_device_to_device = cudaMemcpyDeviceToDevice;
+    static const auto memcpy_host_to_device = cudaMemcpyHostToDevice;
+    static const auto memcpy_device_to_host = cudaMemcpyDeviceToHost;
+
     const auto fftCreate = cufftCreate;
     const auto fftMakePlanMany = cufftMakePlanMany;
     const auto fftExecC2R = cufftExecC2R;
     const auto fftExecR2C = cufftExecR2C;
     const auto fftExecZ2D = cufftExecZ2D;
     const auto fftExecD2Z = cufftExecD2Z;
+    const auto fftExecC2C = cufftExecC2C;
+    const auto fftExecZ2Z = cufftExecZ2Z;
     const auto fftSetStream = cufftSetStream;
+    const auto FFT_FORWARD = CUFFT_FORWARD;
+    const auto FFT_INVERSE = CUFFT_INVERSE;
+
 #endif
+
+extern "C" inline_qualifier void set_gpu_device(int device_id)
+{
+#ifdef __HIPCC__
+    hipSetDevice(device_id);
+#endif
+
+#ifdef __CUDACC__
+    cudaSetDevice(device_id);
+#endif
+}
+
+extern "C" inline_qualifier void Device_synchronize()
+{
+#ifdef __HIPCC__
+    hipDeviceSynchronize();
+#endif
+
+#ifdef __CUDACC__
+    cudaDeviceSynchronize();
+#endif
+}
+
+template <typename T>
+inline_qualifier T *Memory_allocation_gpu(T *data_pointer, size_t count)
+{
+#ifdef __HIPCC__
+    hipMalloc(&data_pointer, sizeof(T) * count);
+#endif
+
+#ifdef __CUDACC__
+    cudaMalloc(&data_pointer, sizeof(T) * count);
+#endif
+
+    return data_pointer;
+}
+
+
+template <typename T>
+inline_qualifier void Memory_copy_cpu_to_gpu(T *data_cpu, T *data_gpu, size_t count)
+{
+#ifdef __HIPCC__
+    hipMemcpy(data_gpu, data_cpu, sizeof(T) * count, hipMemcpyHostToDevice);
+#endif
+
+#ifdef __CUDACC__
+    cudaMemcpy(data_gpu, data_cpu, sizeof(T) * count, cudaMemcpyHostToDevice);
+#endif
+}
+
+template <typename T>
+inline_qualifier void Memory_copy_gpu_to_cpu(T *data_gpu, T *data_cpu, size_t count)
+{
+#ifdef __HIPCC__
+    hipMemcpy(data_cpu, data_gpu, sizeof(T) * count, hipMemcpyDeviceToHost);
+#endif
+
+#ifdef __CUDACC__
+    cudaMemcpy(data_cpu, data_gpu, sizeof(T) * count, cudaMemcpyDeviceToHost);
+#endif
+}
+
+template <typename T>
+inline_qualifier void Memory_copy_gpu_to_gpu(T *data_src, T *data_dest, size_t count)
+{
+#ifdef __HIPCC__
+    hipMemcpy(data_dest, data_src, sizeof(T) * count, hipMemcpyDeviceToDevice);
+#endif
+
+#ifdef __CUDACC__
+    cudaMemcpy(data_dest, data_src, sizeof(T) * count, cudaMemcpyDeviceToDevice);
+#endif
+}
+
 
 #endif
