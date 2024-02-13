@@ -57,4 +57,4 @@ Time of multicore FFT of $1536^3$ grid with 196608 cores of Cray XC40 is compara
 ## FUTURE UPDATES ON THIS LIBRARY
 We have developed a wrapper around this library for using in python as well.
 Which will be soon availaible on this repository.\
-We also have a better version of this FFT that use NVSHMEMS for communication ans is stream aware. This version is currently not open source and can be provided on specific demand submitted on manver@iitk.ac.in or in this repository. This new FFT is suppose to be better than cuFFTMp itself. 
+We also have a better version of this FFT that use NVSHMEMS for communication ans is stream aware. This version is currently not open source and can be provided on specific demand submitted on manver@iitk.ac.in or in this repository. This new FFT (with NVSHMEM) is suppose to be better than cuFFTMp itself. 
