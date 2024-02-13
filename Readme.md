@@ -56,9 +56,7 @@ A Basic installation script is provided in GPU_FFT_TEST_SCRIPT folder. Do a make
 Here we have used a real function :: $f (x, y, z) = 8 sin(x) sin(2y) sin(3z) + 8 sin(4x) sin(5y) sin(6z)$, \
 output will be :
 
-`
-![alt text](image.png)
-`
+![output](image.png)
 
 ## Comparing this FFT with FFTK(CPU BASED FFT DEVELOPED IN OUR LAB)
 Time of multicore FFT of $1536^3$ grid with 196608 cores of Cray XC40 is comparable to that of GPU-FFT of $2048^3$ grid with 128 GPUs.
