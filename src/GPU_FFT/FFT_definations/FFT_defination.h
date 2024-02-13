@@ -1,3 +1,4 @@
+
 /*
 Copyright (c) 2022, Mahendra Verma, Manthan verma, Soumyadeep Chatterjee
 All rights reserved.
@@ -31,54 +32,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
     \brief ---> Code to compute FFT on multi-node on GPUs Scaling upto 512 GPUs for grid size upto 4096^3
     \author ---> Manthan verma, Soumyadeep Chatterjee, Gaurav Garg, Bharatkumar Sharma, Nishant Arya, Shashi Kumar, Mahendra Verma
-    \dated --> Feb 2022
+    \dated --> Feb 2024
     \copyright New BSD License
 */
 
-#include "header.cuh"
+#pragma once
 
-// Explicit initialization of CUFFT R2C
-template<> void cufft_call_r2c<cufftReal,cufftComplex>(cufftHandle &plan,cufftReal* input_data,cufftComplex* output_data)
-{
-    gpuerrcheck_cufft(cufftExecR2C(plan, input_data, output_data), __LINE__);
-}
+#ifndef FFT_DEFINATIONS_H_
+#define FFT_DEFINATIONS_H_
 
-template<> void cufft_call_r2c<cufftDoubleReal,cufftDoubleComplex>(cufftHandle &plan,cufftDoubleReal* input_data,cufftDoubleComplex* output_data)
-{
-    gpuerrcheck_cufft(cufftExecD2Z(plan, input_data, output_data), __LINE__);
-}
+#include "../transitions/transitions.h"
+using int64 = long long int;
 
+// CUFFT Specialization of functions
+template <typename T1, typename T2>
+void cufft_call_r2c(cufftHandle &plan, T1 *input_data, T2 *output_data);
 
-// Explicit initialization of CUFFT C2C
-template<> void cufft_call_c2c<cufftComplex>(cufftHandle &plan,cufftComplex* input_data, int direction)
-{
-    gpuerrcheck_cufft(cufftExecC2C(plan, input_data, input_data,direction), __LINE__);
-}
+template <typename T2>
+void cufft_call_c2c(cufftHandle &plan, T2 *input_data, T2 *output_data, int direction);
 
-template<> void cufft_call_c2c<cufftDoubleComplex>(cufftHandle &plan,cufftDoubleComplex* input_data,int direction)
-{
-    gpuerrcheck_cufft(cufftExecZ2Z(plan, input_data, input_data,direction), __LINE__);
-}
+template <typename T1, typename T2>
+void cufft_call_c2r(cufftHandle &plan, T2 *input_data, T1 *output_data);
 
-// Explicit initialization of CUFFT C2R
-template<> void cufft_call_c2r<cufftComplex,cufftReal>(cufftHandle &plan,cufftComplex* input_data,cufftReal* output_data)
-{
-    gpuerrcheck_cufft(cufftExecC2R(plan, input_data, output_data), __LINE__);
-}
-
-template<> void cufft_call_c2r<cufftDoubleComplex,cufftDoubleReal>(cufftHandle &plan,cufftDoubleComplex* input_data,cufftDoubleReal* output_data)
-{
-    gpuerrcheck_cufft(cufftExecZ2D(plan, input_data, output_data), __LINE__);
-}
-
-// MPI CALLS datatype
-
-template<> MPI_Datatype mpi_type_call(float a)
-{
-    return MPI_CXX_COMPLEX;
-}
-
-template<> MPI_Datatype mpi_type_call(double a)
-{
-    return MPI_CXX_DOUBLE_COMPLEX;
-}
+#endif

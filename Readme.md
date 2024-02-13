@@ -1,57 +1,60 @@
-# This Repository is for FFT libraray Development and Testing
+## GPU_FFT : A FFT DEVELOPED FOR MULTI-NODE MULTI-GPU WORKLOADS
 
-Here Me and My team ( Manthan Verma , Soumyadeep chatterjee, Nishant , sashi , Mahendra kumar verma Sir ) developing and testing the FFT Library development .</br></br>
+This FFT was developed by **Manthan Verma** , Soumyadeep chatterjee and Prof Mahendra Verma in collaboration with **NVIDIA**.
 
-## GPU-FFT
+This is a Open-source parallel FFT primarily for GPUs **(Either AMD or NVIDIA)**.
+This FFT has been tested on **NVIDIA's A100 and AMD INSTINCT MI210 Accelerator GPUs**.
+It Has been tested and scaled on various supercomputers like **selene**, **Param-Siddhi_AI**, **Param-sanganak** etc.
+## CITTING THIS FFT
 
-GPU-FFT is an open source parallel C++ code to compute FFT on GPUs using CUDA.
+This FFT has been published in **S.N. Comp. Sci.** in  Volume 4, article number 625, (2023). \
+Link to the Research paper is : "https://link.springer.com/article/10.1007/s42979-023-02109-0".  
+To Cite this article use-- "**Verma, M., Chatterjee, S., Garg, G. et al. Scalable Multi-node Fast Fourier Transform on GPUs. SN COMPUT. SCI. 4, 625 (2023). https://doi.org/10.1007/s42979-023-02109-0**"
 
-## Getting the Source Code
+<!-- ## SCALING AND BENCHMARKS
 
-GPU-FFT is hosted on GitHub. You can download the source code from the following link:
-       https://github.com/Manthan-Verma/FFT_LIB.git
+We focus on communication and computations times, which are denoted by Tcomp and Tcomm , respectively. Note that the total time T = Tcomp + Tcomm. Here, we report the timmings of a pair of FFTs Forward + Inverse. -->
 
-## Installing GPU-FFT
 
-GPU-FFT requires several libraries (listed later in this section) for compiling. These libraries can be installed in any directory as long as the said directory is added to the user $PATH.
-      
-## Required Libraries
 
-The following libraries are required for installing and running GPU-FFT:
+## INSTALLING GPU_FFT
 
-Cuda Library is used for development of our code. This library can be installed from :
-       https://developer.nvidia.com/cuda-downloads
-       Then choose the system type and download the distribution.
+Installation is very simple. Follow the following steps :
 
-After extracting install the software and go with the instructions. Put the path of installationn where you want to install.
+1. Clone this GIT-REPO
+2. Make sure you have " CUDA-AWARE MPI and CUDA " are installed in your system.
+3. Now do \
+`make CUDA_HOME=<ENTER_CUDA_HOME_DIRECTORY> MPI_HOME=<CUDA_AWARE_MPI_HOME_DIRECTORY>`
+4. Now , do \
+`make INSTALL_DIR=<INSTALLATION_PATH> install`
+5. GPU_FFT will be install in the specified folder path.
 
-An MPI (Message Passing Interface) Library - GPU-FFT uses MPI for parallelism. The software was tested using OPEN-MPI(Version 4.1.1), however, any standard MPI implementation should not be sufficient because for our program to give best scaling and timming we need MPI to be CUDA Aware. Here, we will provide instructions for installing OPEN-MPI. Download OPEN-MPI from:
-    https://www.open-mpi.org/
-    
-After extraction, change to openmpi-4.1.1 folder and enter the following:
+## USING GPU_FFT
+First, make sure the Include and library directories of installed library is in path.
+Then , in your code include :/
+`#include <GPU_FFT/GPU_FFT.h>`
 
-    ./configure --prefix=$(Path to install openmpi) --with-cuda=$(Path to cuda installation) --enable-mpi-cxx
+Now, just after initializing the FFT do \
+`cudaSetDevice()`.\
+Now, in your code make an object to the GPU_FFT class as :\
+`GPU_FFT<T1,T2> *FFT = new GPU_FFT<T1,T2>{Nx,Ny,Nz,procs,rank,MPI_COMMUNICATOR}`
 
-    make all install
-    
-## Compilation instructions
+Here, Nx, Ny, Nz are the dimesnions in real space of the data to be Transformed. procs and rank are the mpi size and rank respectively. MPI_COMMUNICATOR is the COMMUNICATOR with which you want to use the FFT with.
 
-To compile run the following command:
-       nvcc start.cu data_init.cu gpu_data.cu bench.cu cufft_calls.cu -I (path to include dirctory of MPI) -L (path to library dirctory of MPI) -lmpi -lcufft -o run -std=c++17
-       
-       After this a object file named run will be created in the same folder 
-## Detailed Instructions for running and Benchmarking the Program
+Here, T1 and T2 are the templated variables, Where T1 and T2 can be either "float" and "cufftComplex" for single precision or "double" and "cufftDoubleComplex" for double precision. This code supports both single as well as double precision only.
 
-       Our Code runs FFT on GPUs. We used the slab-decomposition in our code because of the lack of less no of GPUs. We used MPI_Isend, MPI_Irecv, CudaMemcpy for communication and 2 our own transpose kernels with high throughput.
-       It calculates 3D FFT R2C on multi-node, multi-GPU using cuFFT in Backend.
-       
-       To run/ Benchmar the code :
-              mpiexec -np <no_of_processes/no_of_GPUs to run on> --host hostname:<no_of_GPU_on_this_host>,hostname2<no_of_GPU_on_this_host> nic_bindings.sh run <x axis grid size> <y axis grid size> <z axis grid size> <no_of_iterations> <precision>
-              
-              example:
-              mpiexec -np 4 --host h1:2,h2:2 nic_bindings.sh run 512 512 512 100 double                      ---> for double preciosn  and grid size ( 512,512,512), for 100 iterations 
-                                                                                                  for single precision put single in place of double.(Put iterations as 1 for single run)
-       
-## Also note that to run this files pls make changes in nic_bindings.sh acc your network topology and please make nic_bindings.sh, run file as executable using chmod or any other command 
+Now initialize the GPU_FFT using `FFT->INIT_GPU_FFT()`.
 
-## To benchmark this code please comment the if comdition inside the function becnhmarking_loop( i.e from line no 134 to 140 in file bench.cu)
+Now you can use the FFT using ,
+`FFT->GPU_FFT_R2C(T1 *data)` or `FFT->GPU_FFT_C2R(T2 *data)`. Where both these functions does the FFT inplace only.
+
+In the end destroy the FFT using `FFT->~GPU_FFT()`.
+
+
+## Comparing this FFT with FFTK(CPU BASED FFT DEVELOPED IN OUR LAB)
+Time of multicore FFT of $1536^3$ grid with 196608 cores of Cray XC40 is comparable to that of GPU-FFT of $2048^3$ grid with 128 GPUs.
+
+## FUTURE UPDATES ON THIS LIBRARY
+We have developed a wrapper around this library for using in python as well.
+Which will be soon availaible on this repository.\
+We also have a better version of this FFT that use NVSHMEMS for communication ans is stream aware. This version is currently not open source and can be provided on specific demand submitted on manver@iitk.ac.in or in this repository. This new FFT is suppose to be better than cuFFTMp itself. 
