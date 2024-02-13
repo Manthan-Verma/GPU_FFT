@@ -21,7 +21,7 @@ We focus on communication and computations times, which are denoted by Tcomp and
 
 Installation is very simple. Follow the following steps :
 
-1. Clone this GIT-REPO
+1. Clone this GIT-REPO and go to GPU_FFT folder
 2. Make sure you have " CUDA-AWARE MPI and CUDA " are installed in your system.
 3. Now do \
 `make CUDA_HOME=<ENTER_CUDA_HOME_DIRECTORY> MPI_HOME=<CUDA_AWARE_MPI_HOME_DIRECTORY>`
@@ -50,6 +50,15 @@ Now you can use the FFT using ,
 
 In the end destroy the FFT using `FFT->~GPU_FFT()`.
 
+## Testing GPU_FFT Installation
+A Basic installation script is provided in GPU_FFT_TEST_SCRIPT folder. Do a make in TEST_SCRIPT folder by setting the relative parameters in make file. and then do `make test_fft Nx=128 Ny=128 Ny=128`
+
+Here we have used a real function :: $f (x, y, z) = 8 sin(x) sin(2y) sin(3z) + 8 sin(4x) sin(5y) sin(6z)$, \
+output will be :
+
+`
+![alt text](image.png)
+`
 
 ## Comparing this FFT with FFTK(CPU BASED FFT DEVELOPED IN OUR LAB)
 Time of multicore FFT of $1536^3$ grid with 196608 cores of Cray XC40 is comparable to that of GPU-FFT of $2048^3$ grid with 128 GPUs.
@@ -57,4 +66,4 @@ Time of multicore FFT of $1536^3$ grid with 196608 cores of Cray XC40 is compara
 ## FUTURE UPDATES ON THIS LIBRARY
 We have developed a wrapper around this library for using in python as well.
 Which will be soon availaible on this repository.\
-We also have a better version of this FFT that use NVSHMEMS for communication ans is stream aware. This version is currently not open source and can be provided on specific demand submitted on manver@iitk.ac.in or in this repository. This new FFT (with NVSHMEM) is suppose to be better than cuFFTMp itself. 
+We also have a better version of this FFT that use NVSHMEMS for communication ans is stream aware. This version is currently not open source and can be provided on specific demand submitted on manver@iitk.ac.in or in this repository. This new FFT is suppose to be better than cuFFTMp itself. 
