@@ -43,17 +43,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../transitions/transitions.h"
 using int64 = long long int;
 
+namespace TRANSPOSE
+{
 
-// Kernel for whole slab transpose
-template <typename T2>
-__global__ void transpose_slab(T2 *matrix_data, T2 *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab);
+   // Kernel for whole slab transpose
+   template <typename T2>
+   __global__ void transpose_slab_(T2 *matrix_data, T2 *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab);
 
-// Kernel for chunk transpose
-template <typename T2>
-__global__ void chunk_transpose(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+   // Kernel for chunk transpose
+   template <typename T2>
+   __global__ void chunk_transpose_(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
 
-// Kernel for chunk transpose
-template <typename T2>
-__global__ void chunk_transpose_inverse(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+   // Kernel for chunk transpose
+   template <typename T2>
+   __global__ void chunk_transpose_inverse_(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+
+} // namespace TRANSPOSE
 
 #endif

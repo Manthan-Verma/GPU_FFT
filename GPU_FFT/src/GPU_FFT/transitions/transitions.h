@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define inline_qualifier inline
 #endif
 
-
 #ifndef TRANSITIONS_H_
 #define TRANSITIONS_H_
 
@@ -55,10 +54,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <initializer_list>
 #include <type_traits>
 
-// GPU Includes
 #ifdef __HIPCC__
 #include <hipfft.h>
 #include <hip/hip_runtime.h>
+
+#endif
+
+#ifdef __CUDACC__
+#include <cufft.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+#include <cuda_profiler_api.h>
+#endif
+
+namespace TRANSITIONS
+{
+
+// GPU Includes
+#ifdef __HIPCC__
     // ########### Type Definations ###########
     typedef hipfftReal T1_f;
     typedef hipfftComplex T2_f;
@@ -92,16 +106,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     const auto fftSetStream = hipfftSetStream;
     const auto FFT_FORWARD = HIPFFT_FORWARD;
     const auto FFT_INVERSE = HIPFFT_BACKWARD;
-    
+
 #endif
 
 #ifdef __CUDACC__
-#include <cufft.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <device_launch_parameters.h>
-#include <cuda_profiler_api.h>
-
     // ########### Type Definations ###########
     typedef cufftReal T1_f;
     typedef cufftComplex T2_f;
@@ -138,78 +146,77 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
-extern "C" inline_qualifier void set_gpu_device(int device_id)
-{
+    extern "C" inline_qualifier void set_gpu_device(int device_id)
+    {
 #ifdef __HIPCC__
-    hipSetDevice(device_id);
+        hipSetDevice(device_id);
 #endif
 
 #ifdef __CUDACC__
-    cudaSetDevice(device_id);
+        cudaSetDevice(device_id);
 #endif
-}
+    }
 
-extern "C" inline_qualifier void Device_synchronize()
-{
+    extern "C" inline_qualifier void Device_synchronize()
+    {
 #ifdef __HIPCC__
-    hipDeviceSynchronize();
+        hipDeviceSynchronize();
 #endif
 
 #ifdef __CUDACC__
-    cudaDeviceSynchronize();
+        cudaDeviceSynchronize();
 #endif
-}
+    }
 
-template <typename T>
-inline_qualifier T *Memory_allocation_gpu(T *data_pointer, size_t count)
-{
+    template <typename T>
+    inline_qualifier T *Memory_allocation_gpu(T *data_pointer, size_t count)
+    {
 #ifdef __HIPCC__
-    hipMalloc(&data_pointer, sizeof(T) * count);
+        hipMalloc(&data_pointer, sizeof(T) * count);
 #endif
 
 #ifdef __CUDACC__
-    cudaMalloc(&data_pointer, sizeof(T) * count);
+        cudaMalloc(&data_pointer, sizeof(T) * count);
 #endif
 
-    return data_pointer;
-}
+        return data_pointer;
+    }
 
-
-template <typename T>
-inline_qualifier void Memory_copy_cpu_to_gpu(T *data_cpu, T *data_gpu, size_t count)
-{
+    template <typename T>
+    inline_qualifier void Memory_copy_cpu_to_gpu(T *data_cpu, T *data_gpu, size_t count)
+    {
 #ifdef __HIPCC__
-    hipMemcpy(data_gpu, data_cpu, sizeof(T) * count, hipMemcpyHostToDevice);
+        hipMemcpy(data_gpu, data_cpu, sizeof(T) * count, hipMemcpyHostToDevice);
 #endif
 
 #ifdef __CUDACC__
-    cudaMemcpy(data_gpu, data_cpu, sizeof(T) * count, cudaMemcpyHostToDevice);
+        cudaMemcpy(data_gpu, data_cpu, sizeof(T) * count, cudaMemcpyHostToDevice);
 #endif
-}
+    }
 
-template <typename T>
-inline_qualifier void Memory_copy_gpu_to_cpu(T *data_gpu, T *data_cpu, size_t count)
-{
+    template <typename T>
+    inline_qualifier void Memory_copy_gpu_to_cpu(T *data_gpu, T *data_cpu, size_t count)
+    {
 #ifdef __HIPCC__
-    hipMemcpy(data_cpu, data_gpu, sizeof(T) * count, hipMemcpyDeviceToHost);
+        hipMemcpy(data_cpu, data_gpu, sizeof(T) * count, hipMemcpyDeviceToHost);
 #endif
 
 #ifdef __CUDACC__
-    cudaMemcpy(data_cpu, data_gpu, sizeof(T) * count, cudaMemcpyDeviceToHost);
+        cudaMemcpy(data_cpu, data_gpu, sizeof(T) * count, cudaMemcpyDeviceToHost);
 #endif
-}
+    }
 
-template <typename T>
-inline_qualifier void Memory_copy_gpu_to_gpu(T *data_src, T *data_dest, size_t count)
-{
+    template <typename T>
+    inline_qualifier void Memory_copy_gpu_to_gpu(T *data_src, T *data_dest, size_t count)
+    {
 #ifdef __HIPCC__
-    hipMemcpy(data_dest, data_src, sizeof(T) * count, hipMemcpyDeviceToDevice);
+        hipMemcpy(data_dest, data_src, sizeof(T) * count, hipMemcpyDeviceToDevice);
 #endif
 
 #ifdef __CUDACC__
-    cudaMemcpy(data_dest, data_src, sizeof(T) * count, cudaMemcpyDeviceToDevice);
+        cudaMemcpy(data_dest, data_src, sizeof(T) * count, cudaMemcpyDeviceToDevice);
 #endif
-}
+    }
 
-
+} // namespace TRANSITIONS
 #endif

@@ -4,10 +4,10 @@ Oflag= -O3
 
 INSTALL_DIR ?= /mnt/Disk_6TB/Manthan/Trash/GPU_FFT
 
-CC_HOME?=/usr/local/cuda-12.2
+CC_HOME?=/opt/rocm-5.0.2/
 CC_INC=$(CC_HOME)/include/
 
-MPI_HOME ?= /scratch/Manthan_phy/hpc_sdk/Linux_x86_64/23.9/comm_libs/mpi
+MPI_HOME ?= /home/manver/Libraries/openmpi_rocm_aware/
 MPI_INC= $(MPI_HOME)/include/
 MPI_LIB= $(MPI_HOME)/lib/
 
@@ -34,7 +34,7 @@ Link_all= $(CUFFT_link) $(MPI_link)
 
 
 start: FFT_implementation.o init_fft.o transpose.o
-	$(CC)  FFT_R2C.o FFT_C2R.o FFT_def.o comm_setup.o init_fft_data.o transpose_ker.o $(INCLUDE_ALL) $(LIB_ALL) -o\
+	$(CC)  gpu_fft.o FFT_R2C.o FFT_C2R.o FFT_def.o comm_setup.o init_fft_data.o transpose_ker.o $(INCLUDE_ALL) $(LIB_ALL) -o\
 	 libGPU_FFT.so $(NVCC_FLAGS) -shared -lc $(Link_all)
 
 FFT_implementation.o: src/FFT_implementation/FFT_C2R.cu src/FFT_implementation/FFT_R2C.cu \
@@ -46,6 +46,7 @@ FFT_implementation.o: src/FFT_implementation/FFT_C2R.cu src/FFT_implementation/F
 init_fft.o: src/initialize_GPU_FFT/communications_setup.cu src/initialize_GPU_FFT/GPU_FFT_init.cu
 	$(CC) src/initialize_GPU_FFT/communications_setup.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o comm_setup.o
 	$(CC) src/initialize_GPU_FFT/GPU_FFT_init.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o init_fft_data.o
+	$(CC) src/initialize_GPU_FFT/GPU_FFT.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) -c -o gpu_fft.o
 
 transpose.o: src/matrix_transpose/transpose.cu
 	$(CC) src/matrix_transpose/transpose.cu $(INCLUDE_ALL) $(LIB_ALL) $(NVCC_FLAGS) $(Oflag) -c -o transpose_ker.o

@@ -35,40 +35,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     \copyright New BSD License
 */
 
+#pragma once
 #include "../GPU_FFT/GPU_FFT.h"
 
 template <typename T1, typename T2>
-void GPU_FFT<T1, T2>::GPU_FFT_C2R(T2 *input_data)
+void GPU_FFT::GPU_FFT_C2R(T2 *input_data)
 {
     // Inverse 1D
-    cufft_call_c2c(planC2C, input_data, buffer, FFT_INVERSE);
+    FFT_DEFINATIONS::fft_call_c2c(planC2C_, input_data, buffer_<T2>, TRANSITIONS::FFT_INVERSE);
 
     // Transpose within chunk, save in slab_outp_data_tr to save space
-    chunk_transpose_inverse<<<grid_fourier_space, block_fourier_space>>>(buffer, input_data, Nx, Ny, Nz, procs);
-    Device_synchronize();
+    TRANSPOSE::chunk_transpose_inverse_<<<grid_fourier_space_, block_fourier_space_>>>(buffer_<T2>, input_data, Nx_, Ny_, Nz_, procs_);
+    TRANSITIONS::Device_synchronize();
 
     // Communications
-    comm_no = 0;
-    for (int i = 0; i < procs; i++)
+    comm_no_ = 0;
+    for (int i = 0; i < procs_; i++)
     {
-        if (i != rank)
+        if (i != rank_)
         {
-            MPI_Irecv(buffer + i * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1)), (Nx / procs) * (Ny / procs) * (Nz / 2 + 1), get_mpi_datatype(temp_variable_for_mpi_datatype), i, 0, MPI_COMMUNICATOR, &requests[(procs - 1) + comm_no]);
-            MPI_Isend(input_data + i * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1)), (Nx / procs) * (Ny / procs) * (Nz / 2 + 1), get_mpi_datatype(temp_variable_for_mpi_datatype), i, 0, MPI_COMMUNICATOR, &requests[comm_no]);
-            comm_no++;
+            MPI_Irecv(buffer_<T2> + i * ((Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1)), (Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1), get_mpi_datatype_(temp_variable_for_mpi_datatype_<T2>), i, 0, MPI_COMMUNICATOR_, &requests_[(procs_ - 1) + comm_no_]);
+            MPI_Isend(input_data + i * ((Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1)), (Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1), get_mpi_datatype_(temp_variable_for_mpi_datatype_<T2>), i, 0, MPI_COMMUNICATOR_, &requests_[comm_no_]);
+            comm_no_++;
         }
     }
-    Memory_copy_gpu_to_gpu((input_data + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (buffer + rank * ((Nx / procs) * (Ny / procs) * (Nz / 2 + 1))), (Nx / procs) * (Ny / procs) * (Nz / 2 + 1));
-    MPI_Waitall(2 * (procs - 1), requests, MPI_STATUS_IGNORE);
+    TRANSITIONS::Memory_copy_gpu_to_gpu((input_data + rank_ * ((Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1))), (buffer_<T2> + rank_ * ((Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1))), (Nx_ / procs_) * (Ny_ / procs_) * (Nz_ / 2 + 1));
+    MPI_Waitall(2 * (procs_ - 1), requests_, MPI_STATUS_IGNORE);
 
     // Transpose
-    transpose_slab<<<grid_fourier_space, block_fourier_space>>>(buffer, input_data, (Nx / procs), Ny, Nz);
-    Device_synchronize();
+    TRANSPOSE::transpose_slab_<<<grid_fourier_space_, block_fourier_space_>>>(buffer_<T2>, input_data, (Nx_ / procs_), Ny_, Nz_);
+    TRANSITIONS::Device_synchronize();
 
-    cufft_call_c2r(planC2R, input_data, (T1 *)input_data);
+    FFT_DEFINATIONS::fft_call_c2r(planC2R_, input_data, (T1 *)input_data);
 }
 
 // ########### Explicit instantiation of class templates ##################
-template class GPU_FFT<T1_f, T2_f>;
-template class GPU_FFT<T1_d, T2_d>;
+template void GPU_FFT::GPU_FFT_C2R<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(TRANSITIONS::T2_f *input_data);
+template void GPU_FFT::GPU_FFT_C2R<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(TRANSITIONS::T2_d *input_data);
 // ########################################################################

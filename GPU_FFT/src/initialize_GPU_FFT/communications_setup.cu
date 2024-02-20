@@ -35,43 +35,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     \copyright New BSD License
 */
 
+#pragma once
 #include "../GPU_FFT/GPU_FFT.h"
-
 
 // ############## Defination for mpi datatype collection ################
 // MPI CALLS datatype
 template <>
-MPI_Datatype get_mpi_datatype(T2_f a)
+MPI_Datatype GPU_FFT::get_mpi_datatype_(TRANSITIONS::T2_f a)
 {
     return MPI_C_COMPLEX;
 }
 
 template <>
-MPI_Datatype get_mpi_datatype(T2_d a)
+MPI_Datatype GPU_FFT::get_mpi_datatype_(TRANSITIONS::T2_d a)
 {
     return MPI_C_DOUBLE_COMPLEX;
 }
 // ######################################################################
 
-
 template <typename T1, typename T2>
-void GPU_FFT<T1, T2>::INIT_GPU_FFT_COMM(int procs, int rank, MPI_Comm &MPI_COMMUNICATOR_INPUT)
+void GPU_FFT::INIT_GPU_FFT_COMM(int procs_in, int rank_in, MPI_Comm &MPI_COMMUNICATOR_INPUT)
 {
     // Setting the MPI Communicator
-    MPI_COMMUNICATOR = MPI_COMMUNICATOR_INPUT;
+    MPI_COMMUNICATOR_ = MPI_COMMUNICATOR_INPUT;
 
-    // Setting the rank and procs
-    this->rank = rank;
-    this->procs = procs;
+    // Setting the rank_ and procs_
+    rank_ = rank_in;
+    procs_ = procs_in;
 
     // Initiating the MPI requests here
-    requests = new MPI_Request[2 * (procs - 1)];
+    requests_ = new MPI_Request[2 * (procs_ - 1)];
 
     // Setting the variable to get mpi datatype
-    temp_variable_for_mpi_datatype = {0, 0};
+    temp_variable_for_mpi_datatype_<T2> = {0, 0};
 }
 
-// ########### Explicit instantiation of class templates ##################
-template class GPU_FFT<T1_f, T2_f>;
-template class GPU_FFT<T1_d, T2_d>;
-// ########################################################################
+// ################################# Explicit instantiations ##################################
+template <>
+TRANSITIONS::T2_f GPU_FFT::temp_variable_for_mpi_datatype_<TRANSITIONS::T2_f>;
+template <>
+TRANSITIONS::T2_d GPU_FFT::temp_variable_for_mpi_datatype_<TRANSITIONS::T2_d>;
+
+template void GPU_FFT::INIT_GPU_FFT_COMM<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(int procs_in, int rank_in, MPI_Comm &MPI_COMMUNICATOR_INPUT);
+template void GPU_FFT::INIT_GPU_FFT_COMM<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(int procs_in, int rank_in, MPI_Comm &MPI_COMMUNICATOR_INPUT);
+// ############################################################################################

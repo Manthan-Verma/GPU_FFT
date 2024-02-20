@@ -44,14 +44,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../transitions/transitions.h"
 using int64 = long long int;
 
-// CUFFT Specialization of functions
-template <typename T1, typename T2>
-void cufft_call_r2c(fftHandle &plan, T1 *input_data, T2 *output_data);
+namespace FFT_DEFINATIONS
+{
+   // CUFFT Specialization of functions
+   template <typename T1, typename T2>
+   void fft_call_r2c(TRANSITIONS::fftHandle &plan, T1 *input_data, T2 *output_data);
 
-template <typename T2>
-void cufft_call_c2c(fftHandle &plan, T2 *input_data, T2 *output_data, int direction);
+   template <typename T2>
+   void fft_call_c2c(TRANSITIONS::fftHandle &plan, T2 *input_data, T2 *output_data, int direction);
 
-template <typename T1, typename T2>
-void cufft_call_c2r(fftHandle &plan, T2 *input_data, T1 *output_data);
+   template <typename T1, typename T2>
+   void fft_call_c2r(TRANSITIONS::fftHandle &plan, T2 *input_data, T1 *output_data);
+} // namespace FFT_DEFINATIONS
 
 #endif

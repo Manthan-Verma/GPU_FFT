@@ -35,10 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     \copyright New BSD License
 */
 
+#pragma once
 #include "../GPU_FFT/GPU_FFT.h"
 
 template <typename T2>
-__global__ void transpose_slab(T2 *matrix_data, T2 *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab)
+__global__ void TRANSPOSE::transpose_slab_(T2 *matrix_data, T2 *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab)
 {
     int64 i = threadIdx.x + (blockDim.x * blockIdx.x);
 
@@ -53,7 +54,7 @@ __global__ void transpose_slab(T2 *matrix_data, T2 *matrix_transpose, int64 Ny_c
 }
 
 template <typename T2>
-__global__ void chunk_transpose(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs)
+__global__ void TRANSPOSE::chunk_transpose_(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs)
 {
     int64 i = (blockDim.x * blockIdx.x) + threadIdx.x;
 
@@ -72,7 +73,7 @@ __global__ void chunk_transpose(T2 *matrix_data, T2 *matrix_transpose, int64 Nx,
 }
 
 template <typename T2>
-__global__ void chunk_transpose_inverse(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs)
+__global__ void TRANSPOSE::chunk_transpose_inverse_(T2 *matrix_data, T2 *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs)
 {
     int64 i = (blockDim.x * blockIdx.x) + threadIdx.x;
 
@@ -90,11 +91,11 @@ __global__ void chunk_transpose_inverse(T2 *matrix_data, T2 *matrix_transpose, i
 }
 
 // ########### Explicit instantiation ###########
-template __global__ void chunk_transpose_inverse<T2_f>(T2_f *matrix_data, T2_f *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
-template __global__ void chunk_transpose<T2_f>(T2_f *matrix_data, T2_f *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
-template __global__ void transpose_slab<T2_f>(T2_f *matrix_data, T2_f *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab);
+template __global__ void TRANSPOSE::chunk_transpose_inverse_<TRANSITIONS::T2_f>(TRANSITIONS::T2_f *matrix_data, TRANSITIONS::T2_f *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+template __global__ void TRANSPOSE::chunk_transpose_<TRANSITIONS::T2_f>(TRANSITIONS::T2_f *matrix_data, TRANSITIONS::T2_f *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+template __global__ void TRANSPOSE::transpose_slab_<TRANSITIONS::T2_f>(TRANSITIONS::T2_f *matrix_data, TRANSITIONS::T2_f *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab);
 
-template __global__ void chunk_transpose_inverse<T2_d>(T2_d *matrix_data, T2_d *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
-template __global__ void chunk_transpose<T2_d>(T2_d *matrix_data, T2_d *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
-template __global__ void transpose_slab<T2_d>(T2_d *matrix_data, T2_d *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab);
+template __global__ void TRANSPOSE::chunk_transpose_inverse_<TRANSITIONS::T2_d>(TRANSITIONS::T2_d *matrix_data, TRANSITIONS::T2_d *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+template __global__ void TRANSPOSE::chunk_transpose_<TRANSITIONS::T2_d>(TRANSITIONS::T2_d *matrix_data, TRANSITIONS::T2_d *matrix_transpose, int64 Nx, int64 Ny, int64 Nz, int procs);
+template __global__ void TRANSPOSE::transpose_slab_<TRANSITIONS::T2_d>(TRANSITIONS::T2_d *matrix_data, TRANSITIONS::T2_d *matrix_transpose, int64 Ny_current_slab, int64 Nx_current_slab, int64 Nz_current_slab);
 // ##############################################
