@@ -48,13 +48,13 @@ namespace FFT_DEFINATIONS
 {
    // CUFFT Specialization of functions
    template <typename T1, typename T2>
-   void fft_call_r2c(TRANSITIONS::fftHandle &plan, T1 *input_data, T2 *output_data);
+   void __fft_call_r2c__(TRANSITIONS::fftHandle &plan, T1 *input_data, T2 *output_data);
 
    template <typename T2>
-   void fft_call_c2c(TRANSITIONS::fftHandle &plan, T2 *input_data, T2 *output_data, int direction);
+   void __fft_call_c2c__(TRANSITIONS::fftHandle &plan, T2 *input_data, T2 *output_data, int direction);
 
    template <typename T1, typename T2>
-   void fft_call_c2r(TRANSITIONS::fftHandle &plan, T2 *input_data, T1 *output_data);
+   void __fft_call_c2r__(TRANSITIONS::fftHandle &plan, T2 *input_data, T1 *output_data);
 } // namespace FFT_DEFINATIONS
 
 #endif

@@ -41,63 +41,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <typename T1, typename T2>
 void GPU_FFT::INIT_GPU_FFT(int64 Nx_in, int64 Ny_in, int64 Nz_in, int procs, int rank, MPI_Comm &MPI_COMMUNICATOR_INPUT)
 {
-
     // Setting the 3D dimensions of real space data
-    Nx_ = Nx_in;
-    Ny_ = Ny_in;
-    Nz_ = Nz_in;
+    __Nx__ = Nx_in;
+    __Ny__ = Ny_in;
+    __Nz__ = Nz_in;
 
-    // Initalizing the buffer_ data pointer
-    buffer_<T2> = TRANSITIONS::Memory_allocation_gpu(buffer_<T2>, Nx_ * (Ny_ / procs) * (Nz_ / 2 + 1));
+    // Initalizing the __buffer__ data pointer
+    __buffer__<T2> = TRANSITIONS::__Memory_allocation_gpu__(__buffer__<T2>, __Nx__ * (__Ny__ / procs) * (__Nz__ / 2 + 1));
 
     // Setting the grid and blocks for FFT kernels
-    grid_fourier_space_ = {static_cast<unsigned int>((Nx_ * (Ny_ / procs) * (Nz_ / 2 + 1)) / 256) + 1, 1, 1};
-    block_fourier_space_ = {256, 1, 1};
+    __grid_fourier_space__ = {static_cast<unsigned int>((__Nx__ * (__Ny__ / procs) * (__Nz__ / 2 + 1)) / 256) + 1, 1, 1};
+    __block_fourier_space__ = {256, 1, 1};
 
     // Now initialiazing the FFT
     INIT_GPU_FFT_COMM<T1, T2>(procs, rank, MPI_COMMUNICATOR_INPUT);
 
     // ################################### Intializzing the FFT Plans ######################################
     // R2C DATA
-    n_r2c_[0] = Ny_;
-    n_r2c_[1] = Nz_;
-    BATCHED_SIZE_R2C_ = Nz_ * Ny_;
-    BATCH_r2c_ = (Nx_ / procs);
+    __n_r2c__[0] = __Ny__;
+    __n_r2c__[1] = __Nz__;
+    __BATCHED_SIZE_R2C__ = __Nz__ * __Ny__;
+    __BATCH_r2c__ = (__Nx__ / procs);
 
     // C2C DATA
-    n_c2c_[0] = Nx_;
-    inembed_c2c_ = new int[1]{static_cast<int>(Nx_)};
-    onembed_c2c_ = new int[1]{static_cast<int>(Nx_)};
-    BATCHED_SIZE_C2C_ = Nx_;
-    istride_c2c_ = (Ny_ / procs) * (Nz_ / 2 + 1);
-    ostride_c2c_ = (Ny_ / procs) * (Nz_ / 2 + 1);
-    BATCH_C2C_ = (Ny_ / procs) * (Nz_ / 2 + 1);
-    worksize_ = new size_t{};
+    __n_c2c__[0] = __Nx__;
+    __inembed_c2c__ = new int[1]{static_cast<int>(__Nx__)};
+    __onembed_c2c__ = new int[1]{static_cast<int>(__Nx__)};
+    __BATCHED_SIZE_C2C__ = __Nx__;
+    __istride_c2c__ = (__Ny__ / procs) * (__Nz__ / 2 + 1);
+    __ostride_c2c__ = (__Ny__ / procs) * (__Nz__ / 2 + 1);
+    __BATCH_C2C__ = (__Ny__ / procs) * (__Nz__ / 2 + 1);
+    __worksize__ = new size_t{};
 
     // Initializing some points for plan initialization
     if (std::is_same<T1, TRANSITIONS::T1_d>::value)
     {
         // CUFFT TYPES
-        type_r2c_ = TRANSITIONS::FFT_D2Z;
-        type_c2r_ = TRANSITIONS::FFT_Z2D;
-        type_c2c_ = TRANSITIONS::FFT_Z2Z;
+        __type_r2c__ = TRANSITIONS::FFT_D2Z;
+        __type_c2r__ = TRANSITIONS::FFT_Z2D;
+        __type_c2c__ = TRANSITIONS::FFT_Z2Z;
     }
 
     // Plans intiialization
-    TRANSITIONS::fftCreate(&planR2C_);
-    TRANSITIONS::fftCreate(&planC2R_);
-    TRANSITIONS::fftCreate(&planC2C_);
-    TRANSITIONS::fftMakePlanMany(planC2C_, rank_c2c_, n_c2c_, inembed_c2c_, istride_c2c_, idist_c2c_, onembed_c2c_, ostride_c2c_, odist_c2c_, type_c2c_, BATCH_C2C_, worksize_);
-    TRANSITIONS::fftMakePlanMany(planR2C_, rank_r2c_, n_r2c_, inembed_r2c_, istride_r2c_, idist_r2c_, onembed_r2c_, ostride_r2c_, odist_r2c_, type_r2c_, BATCH_r2c_, worksize_);
-    TRANSITIONS::fftMakePlanMany(planC2R_, rank_r2c_, n_r2c_, inembed_r2c_, istride_r2c_, idist_r2c_, onembed_r2c_, ostride_r2c_, odist_r2c_, type_c2r_, BATCH_r2c_, worksize_);
+    TRANSITIONS::fftCreate(&__planR2C__);
+    TRANSITIONS::fftCreate(&__planC2R__);
+    TRANSITIONS::fftCreate(&__planC2C__);
+    TRANSITIONS::fftMakePlanMany(__planC2C__, __rank_c2c__, __n_c2c__, __inembed_c2c__, __istride_c2c__, __idist_c2c__, __onembed_c2c__, __ostride_c2c__, __odist_c2c__, __type_c2c__, __BATCH_C2C__, __worksize__);
+    TRANSITIONS::fftMakePlanMany(__planR2C__, __rank_r2c__, __n_r2c__, __inembed_r2c__, __istride_r2c__, __idist_r2c__, __onembed_r2c__, __ostride_r2c__, __odist_r2c__, __type_r2c__, __BATCH_r2c__, __worksize__);
+    TRANSITIONS::fftMakePlanMany(__planC2R__, __rank_r2c__, __n_r2c__, __inembed_r2c__, __istride_r2c__, __idist_r2c__, __onembed_r2c__, __ostride_r2c__, __odist_r2c__, __type_c2r__, __BATCH_r2c__, __worksize__);
     // ###################################################################################################
 }
 
 // ########### Explicit instantiation of class templates ##################
 template <>
-TRANSITIONS::T2_f *GPU_FFT::buffer_<TRANSITIONS::T2_f>;
+TRANSITIONS::T2_f *GPU_FFT::__buffer__<TRANSITIONS::T2_f>;
 template <>
-TRANSITIONS::T2_d *GPU_FFT::buffer_<TRANSITIONS::T2_d>;
+TRANSITIONS::T2_d *GPU_FFT::__buffer__<TRANSITIONS::T2_d>;
 
 template void GPU_FFT::INIT_GPU_FFT<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(int64 Nx_in, int64 Ny_in, int64 Nz_in, int procs, int rank, MPI_Comm &MPI_COMMUNICATOR_INPUT);
 template void GPU_FFT::INIT_GPU_FFT<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(int64 Nx_in, int64 Ny_in, int64 Nz_in, int procs, int rank, MPI_Comm &MPI_COMMUNICATOR_INPUT);

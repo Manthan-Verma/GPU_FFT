@@ -146,18 +146,7 @@ namespace TRANSITIONS
 
 #endif
 
-    extern "C" inline_qualifier void set_gpu_device(int device_id)
-    {
-#ifdef __HIPCC__
-        hipSetDevice(device_id);
-#endif
-
-#ifdef __CUDACC__
-        cudaSetDevice(device_id);
-#endif
-    }
-
-    extern "C" inline_qualifier void Device_synchronize()
+    extern "C" inline_qualifier void __Device_synchronize__()
     {
 #ifdef __HIPCC__
         hipDeviceSynchronize();
@@ -169,7 +158,7 @@ namespace TRANSITIONS
     }
 
     template <typename T>
-    inline_qualifier T *Memory_allocation_gpu(T *data_pointer, size_t count)
+    inline_qualifier T *__Memory_allocation_gpu__(T *data_pointer, size_t count)
     {
 #ifdef __HIPCC__
         hipMalloc(&data_pointer, sizeof(T) * count);
@@ -183,7 +172,7 @@ namespace TRANSITIONS
     }
 
     template <typename T>
-    inline_qualifier void Memory_copy_cpu_to_gpu(T *data_cpu, T *data_gpu, size_t count)
+    inline_qualifier void __Memory_copy_cpu_to_gpu__(T *data_cpu, T *data_gpu, size_t count)
     {
 #ifdef __HIPCC__
         hipMemcpy(data_gpu, data_cpu, sizeof(T) * count, hipMemcpyHostToDevice);
@@ -195,7 +184,7 @@ namespace TRANSITIONS
     }
 
     template <typename T>
-    inline_qualifier void Memory_copy_gpu_to_cpu(T *data_gpu, T *data_cpu, size_t count)
+    inline_qualifier void __Memory_copy_gpu_to_cpu__(T *data_gpu, T *data_cpu, size_t count)
     {
 #ifdef __HIPCC__
         hipMemcpy(data_cpu, data_gpu, sizeof(T) * count, hipMemcpyDeviceToHost);
@@ -207,7 +196,7 @@ namespace TRANSITIONS
     }
 
     template <typename T>
-    inline_qualifier void Memory_copy_gpu_to_gpu(T *data_src, T *data_dest, size_t count)
+    inline_qualifier void __Memory_copy_gpu_to_gpu__(T *data_src, T *data_dest, size_t count)
     {
 #ifdef __HIPCC__
         hipMemcpy(data_dest, data_src, sizeof(T) * count, hipMemcpyDeviceToDevice);

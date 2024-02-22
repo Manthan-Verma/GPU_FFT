@@ -41,13 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ############## Defination for mpi datatype collection ################
 // MPI CALLS datatype
 template <>
-MPI_Datatype GPU_FFT::get_mpi_datatype_(TRANSITIONS::T2_f a)
+MPI_Datatype GPU_FFT::__get_mpi_datatype__(TRANSITIONS::T2_f a)
 {
     return MPI_C_COMPLEX;
 }
 
 template <>
-MPI_Datatype GPU_FFT::get_mpi_datatype_(TRANSITIONS::T2_d a)
+MPI_Datatype GPU_FFT::__get_mpi_datatype__(TRANSITIONS::T2_d a)
 {
     return MPI_C_DOUBLE_COMPLEX;
 }
@@ -57,24 +57,24 @@ template <typename T1, typename T2>
 void GPU_FFT::INIT_GPU_FFT_COMM(int procs_in, int rank_in, MPI_Comm &MPI_COMMUNICATOR_INPUT)
 {
     // Setting the MPI Communicator
-    MPI_COMMUNICATOR_ = MPI_COMMUNICATOR_INPUT;
+    __MPI_COMMUNICATOR__ = MPI_COMMUNICATOR_INPUT;
 
     // Setting the rank_ and procs_
-    rank_ = rank_in;
-    procs_ = procs_in;
+    __rank__ = rank_in;
+    __procs__ = procs_in;
 
     // Initiating the MPI requests here
-    requests_ = new MPI_Request[2 * (procs_ - 1)];
+    __requests__ = new MPI_Request[2 * (__procs__ - 1)];
 
     // Setting the variable to get mpi datatype
-    temp_variable_for_mpi_datatype_<T2> = {0, 0};
+    __temp_variable_for_mpi_datatype__<T2> = {0, 0};
 }
 
 // ################################# Explicit instantiations ##################################
 template <>
-TRANSITIONS::T2_f GPU_FFT::temp_variable_for_mpi_datatype_<TRANSITIONS::T2_f>;
+TRANSITIONS::T2_f GPU_FFT::__temp_variable_for_mpi_datatype__<TRANSITIONS::T2_f>;
 template <>
-TRANSITIONS::T2_d GPU_FFT::temp_variable_for_mpi_datatype_<TRANSITIONS::T2_d>;
+TRANSITIONS::T2_d GPU_FFT::__temp_variable_for_mpi_datatype__<TRANSITIONS::T2_d>;
 
 template void GPU_FFT::INIT_GPU_FFT_COMM<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(int procs_in, int rank_in, MPI_Comm &MPI_COMMUNICATOR_INPUT);
 template void GPU_FFT::INIT_GPU_FFT_COMM<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(int procs_in, int rank_in, MPI_Comm &MPI_COMMUNICATOR_INPUT);

@@ -6,7 +6,6 @@
 #include <initializer_list>
 #include <type_traits>
 #include <GPU_FFT/GPU_FFT.h>
-#include <GPU_FFT/transitions/transitions.h>
 
 int64 Nx{0};
 int64 Ny{0};

@@ -40,39 +40,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Explicit initialization of CUFFT R2C
 template <>
-void FFT_DEFINATIONS::fft_call_r2c<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T1_f *input_data, TRANSITIONS::T2_f *output_data)
+void FFT_DEFINATIONS::__fft_call_r2c__<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T1_f *input_data, TRANSITIONS::T2_f *output_data)
 {
     TRANSITIONS::fftExecR2C(plan, input_data, output_data);
 }
 
 template <>
-void FFT_DEFINATIONS::fft_call_r2c<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T1_d *input_data, TRANSITIONS::T2_d *output_data)
+void FFT_DEFINATIONS::__fft_call_r2c__<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T1_d *input_data, TRANSITIONS::T2_d *output_data)
 {
     TRANSITIONS::fftExecD2Z(plan, input_data, output_data);
 }
 
 // Explicit initialization of CUFFT C2C
 template <>
-void FFT_DEFINATIONS::fft_call_c2c<TRANSITIONS::T2_f>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_f *input_data, TRANSITIONS::T2_f *output_data, int direction)
+void FFT_DEFINATIONS::__fft_call_c2c__<TRANSITIONS::T2_f>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_f *input_data, TRANSITIONS::T2_f *output_data, int direction)
 {
     TRANSITIONS::fftExecC2C(plan, input_data, output_data, direction);
 }
 
 template <>
-void FFT_DEFINATIONS::fft_call_c2c<TRANSITIONS::T2_d>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_d *input_data, TRANSITIONS::T2_d *output_data, int direction)
+void FFT_DEFINATIONS::__fft_call_c2c__<TRANSITIONS::T2_d>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_d *input_data, TRANSITIONS::T2_d *output_data, int direction)
 {
     TRANSITIONS::fftExecZ2Z(plan, input_data, output_data, direction);
 }
 
 // Explicit initialization of CUFFT C2R
 template <>
-void FFT_DEFINATIONS::fft_call_c2r<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_f *input_data, TRANSITIONS::T1_f *output_data)
+void FFT_DEFINATIONS::__fft_call_c2r__<TRANSITIONS::T1_f, TRANSITIONS::T2_f>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_f *input_data, TRANSITIONS::T1_f *output_data)
 {
     TRANSITIONS::fftExecC2R(plan, input_data, output_data);
 }
 
 template <>
-void FFT_DEFINATIONS::fft_call_c2r<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_d *input_data, TRANSITIONS::T1_d *output_data)
+void FFT_DEFINATIONS::__fft_call_c2r__<TRANSITIONS::T1_d, TRANSITIONS::T2_d>(TRANSITIONS::fftHandle &plan, TRANSITIONS::T2_d *input_data, TRANSITIONS::T1_d *output_data)
 {
     TRANSITIONS::fftExecZ2D(plan, input_data, output_data);
 }

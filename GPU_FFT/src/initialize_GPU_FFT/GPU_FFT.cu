@@ -40,51 +40,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace GPU_FFT
 {
-    int64 Nx_{0}; // Nx in CPU Memory
-    int64 Ny_{0}; // Ny in CPU Memory
-    int64 Nz_{0}; // Nz in CPU Memory
+    int64 __Nx__{0}; // Nx in CPU Memory
+    int64 __Ny__{0}; // Ny in CPU Memory
+    int64 __Nz__{0}; // Nz in CPU Memory
 
     // Communication Variables
-    int procs_; // procs for CPU Memory
-    int rank_;  // rank for CPU Memory
+    int __procs__; // procs for CPU Memory
+    int __rank__;  // rank for CPU Memory
 
     // MPI Communicator
-    MPI_Comm MPI_COMMUNICATOR_;
+    MPI_Comm __MPI_COMMUNICATOR__;
 
     // MPI Requests
-    MPI_Request *requests_;
+    MPI_Request *__requests__;
 
     // Buffer data pointer
     template <typename T2>
-    T2 *buffer_;
+    T2 *__buffer__;
 
     // Variable to get MPI Datatype
     template <typename T2>
-    T2 temp_variable_for_mpi_datatype_;
+    T2 __temp_variable_for_mpi_datatype__;
 
     // cOMMUNICATION NUMBER
-    int comm_no_{0};
+    int __comm_no__{0};
 
     // CUFFT DATA POINTS
-    TRANSITIONS::fftHandle planR2C_, planC2R_, planC2C_;
-    size_t *worksize_;
-    int n_r2c_[2], *inembed_r2c_{nullptr}, *onembed_r2c_{nullptr}, istride_r2c_{1}, ostride_r2c_{1};
-    int idist_r2c_{1}, odist_r2c_{1}, BATCH_r2c_;
-    int64 BATCHED_SIZE_R2C_;
+    TRANSITIONS::fftHandle __planR2C__, __planC2R__, __planC2C__;
+    size_t *__worksize__;
+    int __n_r2c__[2], *__inembed_r2c__{nullptr}, *__onembed_r2c__{nullptr}, __istride_r2c__{1}, __ostride_r2c__{1};
+    int __idist_r2c__{1}, __odist_r2c__{1}, __BATCH_r2c__;
+    int64 __BATCHED_SIZE_R2C__;
 
-    int rank_c2c_{1}, rank_r2c_{2};
-    int n_c2c_[1], *inembed_c2c_, *onembed_c2c_;
-    int istride_c2c_, ostride_c2c_, odist_c2c_{1}, idist_c2c_{1}, BATCH_C2C_;
-    int64 BATCHED_SIZE_C2C_;
+    int __rank_c2c__{1}, __rank_r2c__{2};
+    int __n_c2c__[1], *__inembed_c2c__, *__onembed_c2c__;
+    int __istride_c2c__, __ostride_c2c__, __odist_c2c__{1}, __idist_c2c__{1}, __BATCH_C2C__;
+    int64 __BATCHED_SIZE_C2C__;
 
     // Grid and block of kernel launch
-    dim3 grid_fourier_space_;
-    dim3 block_fourier_space_;
+    dim3 __grid_fourier_space__;
+    dim3 __block_fourier_space__;
 
     // CUFFT TYPES
-    TRANSITIONS::ffttype_t type_r2c_{TRANSITIONS::FFT_R2C};
-    TRANSITIONS::ffttype_t type_c2r_{TRANSITIONS::FFT_C2R};
-    TRANSITIONS::ffttype_t type_c2c_{TRANSITIONS::FFT_C2C};
+    TRANSITIONS::ffttype_t __type_r2c__{TRANSITIONS::FFT_R2C};
+    TRANSITIONS::ffttype_t __type_c2r__{TRANSITIONS::FFT_C2R};
+    TRANSITIONS::ffttype_t __type_c2c__{TRANSITIONS::FFT_C2C};
 
     // GPU_FFT Functions
     template <typename T1, typename T2>
@@ -101,6 +101,6 @@ namespace GPU_FFT
 
     // Teamplate for getting MPI datatype
     template <typename T>
-    MPI_Datatype get_mpi_datatype_(T a);
+    MPI_Datatype __get_mpi_datatype__(T a);
 
 } // namespace GPU_FFT

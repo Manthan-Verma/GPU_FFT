@@ -61,51 +61,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace GPU_FFT
 {
-    extern "C" int64 Nx_; // Nx in CPU Memory
-    extern "C" int64 Ny_; // Ny in CPU Memory
-    extern "C" int64 Nz_; // Nz in CPU Memory
+    extern "C" int64 __Nx__; // Nx in CPU Memory
+    extern "C" int64 __Ny__; // Ny in CPU Memory
+    extern "C" int64 __Nz__; // Nz in CPU Memory
 
     // Communication Variables
-    extern "C" int procs_; // procs for CPU Memory
-    extern "C" int rank_;  // rank for CPU Memory
+    extern "C" int __procs__; // procs for CPU Memory
+    extern "C" int __rank__;  // rank for CPU Memory
 
     // MPI Communicator
-    extern "C" MPI_Comm MPI_COMMUNICATOR_;
+    extern "C" MPI_Comm __MPI_COMMUNICATOR__;
 
     // MPI Requests
-    extern "C" MPI_Request *requests_;
+    extern "C" MPI_Request *__requests__;
 
     // Buffer data pointer
     template <typename T2>
-    extern T2 *buffer_;
+    extern T2 *__buffer__;
 
     // Variable to get MPI Datatype
     template <typename T2>
-    extern  T2 temp_variable_for_mpi_datatype_;
+    extern  T2 __temp_variable_for_mpi_datatype__;
 
     // cOMMUNICATION NUMBER
-    extern "C" int comm_no_;
+    extern "C" int __comm_no__;
 
     // CUFFT DATA POINTS
-    extern "C" TRANSITIONS::fftHandle planR2C_, planC2R_, planC2C_;
-    extern "C" size_t *worksize_;
-    extern "C" int n_r2c_[2], *inembed_r2c_, *onembed_r2c_, istride_r2c_, ostride_r2c_;
-    extern "C" int idist_r2c_, odist_r2c_, BATCH_r2c_;
-    extern "C" int64 BATCHED_SIZE_R2C_;
+    extern "C" TRANSITIONS::fftHandle __planR2C__, __planC2R__, __planC2C__;
+    extern "C" size_t *__worksize__;
+    extern "C" int __n_r2c__[2], *__inembed_r2c__, *__onembed_r2c__, __istride_r2c__, __ostride_r2c__;
+    extern "C" int __idist_r2c__, __odist_r2c__, __BATCH_r2c__;
+    extern "C" int64 __BATCHED_SIZE_R2C__;
 
-    extern "C" int rank_c2c_, rank_r2c_;
-    extern "C" int n_c2c_[1], *inembed_c2c_, *onembed_c2c_;
-    extern "C" int istride_c2c_, ostride_c2c_, odist_c2c_, idist_c2c_, BATCH_C2C_;
-    extern "C" int64 BATCHED_SIZE_C2C_;
+    extern "C" int __rank_c2c__, __rank_r2c__;
+    extern "C" int __n_c2c__[1], *__inembed_c2c__, *__onembed_c2c__;
+    extern "C" int __istride_c2c__, __ostride_c2c__, __odist_c2c__, __idist_c2c__, __BATCH_C2C__;
+    extern "C" int64 __BATCHED_SIZE_C2C__;
 
     // Grid and block of kernel launch
-    extern "C" dim3 grid_fourier_space_;
-    extern "C" dim3 block_fourier_space_;
+    extern "C" dim3 __grid_fourier_space__;
+    extern "C" dim3 __block_fourier_space__;
 
     // CUFFT TYPES
-    extern "C" TRANSITIONS::ffttype_t type_r2c_;
-    extern "C" TRANSITIONS::ffttype_t type_c2r_;
-    extern "C" TRANSITIONS::ffttype_t type_c2c_;
+    extern "C" TRANSITIONS::ffttype_t __type_r2c__;
+    extern "C" TRANSITIONS::ffttype_t __type_c2r__;
+    extern "C" TRANSITIONS::ffttype_t __type_c2c__;
 
     // GPU_FFT Functions
     template <typename T1, typename T2>
@@ -122,7 +122,7 @@ namespace GPU_FFT
 
     // Teamplate for getting MPI datatype
     template <typename T>
-    MPI_Datatype get_mpi_datatype_(T a);
+    MPI_Datatype __get_mpi_datatype__(T a);
 
 } // namespace GPU_FFT
 
