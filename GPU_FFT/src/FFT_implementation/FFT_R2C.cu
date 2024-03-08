@@ -50,17 +50,24 @@ void GPU_FFT::GPU_FFT_R2C(T1 *input_data)
 
     // Communication
     __comm_no__ = 0;
-    for (int i = 0; i < __procs__; i++)
+	// receives
+	for (int ii = 1; ii < __procs__; ii++)
     {
-        if (i != __rank__)
-        {
-            MPI_Irecv(((T2 *)input_data) + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__, &(__requests__[(__procs__ - 1) + __comm_no__]));
-            MPI_Isend(__buffer__<T2> + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__, &(__requests__[__comm_no__]));
-            __comm_no__++;
-        }
+        int i = (__rank__+ii)%__procs__;
+        MPI_Irecv(((T2 *)input_data) + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__, &(__requests__[__comm_no__]));
+        __comm_no__++;
     }
+	MPI_Barrier(__MPI_COMMUNICATOR__);
+
+	// sends
+	for (int ii = 1; ii < __procs__; ii++)
+    {
+        int i = (__rank__+ii)%__procs__;
+        MPI_Send(__buffer__<T2> + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__);
+    }
+    MPI_Waitall((__procs__ - 1), __requests__, MPI_STATUS_IGNORE);
+
     TRANSITIONS::__Memory_copy_gpu_to_gpu__((__buffer__<T2> + __rank__ * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1))), (((T2 *)input_data) + __rank__ * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1))), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1));
-    MPI_Waitall(2 * (__procs__ - 1), __requests__, MPI_STATUS_IGNORE);
 
     // Transpose within chunk, save in slab_outp_data_tr to save space
     TRANSPOSE::__chunk_transpose__<<<__grid_fourier_space__, __block_fourier_space__>>>(((T2 *)input_data), __buffer__<T2>, __Nx__, __Ny__, __Nz__, __procs__);
