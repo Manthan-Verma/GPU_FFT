@@ -50,17 +50,22 @@ void GPU_FFT::GPU_FFT_C2R(T2 *input_data)
 
     // Communications
     __comm_no__ = 0;
-    for (int i = 0; i < __procs__; i++)
+    for (int ii = 1; ii < __procs__; ii++)
     {
-        if (i != __rank__)
-        {
-            MPI_Irecv(__buffer__<T2> + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__, &__requests__[(__procs__ - 1) + __comm_no__]);
-            MPI_Isend(input_data + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__, &__requests__[__comm_no__]);
-            __comm_no__++;
-        }
+		int i = (__rank__+ii)%__procs__;
+        MPI_Irecv(__buffer__<T2> + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__, &__requests__[__comm_no__]);
+        __comm_no__++;
     }
+	MPI_Barrier(__MPI_COMMUNICATOR__);
+
+    for (int ii = 1; ii < __procs__; ii++)
+    {
+		int i = (__rank__+ii)%__procs__;
+        MPI_Send(input_data + i * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1)), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1), __get_mpi_datatype__(__temp_variable_for_mpi_datatype__<T2>), i, 0, __MPI_COMMUNICATOR__);
+    }
+    MPI_Waitall((__procs__ - 1), __requests__, MPI_STATUS_IGNORE);
+
     TRANSITIONS::__Memory_copy_gpu_to_gpu__((input_data + __rank__ * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1))), (__buffer__<T2> + __rank__ * ((__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1))), (__Nx__ / __procs__) * (__Ny__ / __procs__) * (__Nz__ / 2 + 1));
-    MPI_Waitall(2 * (__procs__ - 1), __requests__, MPI_STATUS_IGNORE);
 
     // Transpose
     TRANSPOSE::__transpose_slab__<<<__grid_fourier_space__, __block_fourier_space__>>>(__buffer__<T2>, input_data, (__Nx__ / __procs__), __Ny__, __Nz__);
